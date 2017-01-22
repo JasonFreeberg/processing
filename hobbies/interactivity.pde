@@ -1,4 +1,4 @@
-
+// Scrollbar for date selection
 // Class thanks to https://processing.org/examples/scrollbar.html
 class HScrollbar {
   int swidth, sheight;    // width and height of bar
@@ -17,7 +17,8 @@ class HScrollbar {
     ratio = (float)sw / (float)widthtoheight;
     xpos = xp;
     ypos = yp-sheight/2;
-    spos = xpos + swidth/2 - sheight/2;
+    spos = xp;
+    //spos = xpos + swidth/2 - sheight/2;
     newspos = spos;
     sposMin = xpos;
     sposMax = xpos + swidth - sheight;
@@ -50,7 +51,7 @@ class HScrollbar {
 
   boolean overEvent() {
     if (mouseX > xpos && mouseX < xpos+swidth &&
-       mouseY > ypos && mouseY < ypos+sheight) {
+      mouseY > ypos && mouseY < ypos+sheight) {
       return true;
     } else {
       return false;
@@ -74,4 +75,16 @@ class HScrollbar {
     // 0 and the total width of the scrollbar
     return spos * ratio;
   }
+}
+
+// Function to print date and rewrite when updated
+// Uses day, month, and year variables declared prior to function calls
+void printDate() {
+  day = (int)row[0];
+  month = getMonth(row[1]);
+  year = (int)row[2];
+
+  date = month + " " + day + ", " + year;
+  textAlign(CENTER);
+  text(date, width/2, height-(verticalMargin/2));
 }
