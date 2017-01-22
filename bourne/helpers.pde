@@ -1,20 +1,19 @@
-
-float max2D(float[][] dataMatrix){
-  float max = 0;
-  for(int row = 3; row < dataMatrix.length; row++){
-    for(int col = 1; col < dataMatrix[row].length - 1; col++){
-      if(dataMatrix[row][col] > max) max = dataMatrix[row][col]; 
-    }
-  }  
+float columnMax(float data[][], int column){
+  float max = MIN_FLOAT;
+  
+  for(int row = 0; row < data.length; row++){
+    if(data[row][column] > max) max = data[row][column];
+  }
+  
   return max;
 }
 
-float min2D(float[][] dataMatrix){
-  float min = max2D(dataMatrix);
-  for(int row = 3; row < dataMatrix.length; row++){
-    for(int col = 0; col < dataMatrix[row].length - 1; col++){
-      if(dataMatrix[row][col] < min) min = dataMatrix[row][col]; 
-    }
-  }  
+float columnMin(float data[][], int column){
+  float min = MAX_FLOAT;
+  
+  for(int row = 0; row < data.length; row++){
+    if(data[row][column] < min) min = data[row][column];
+  }
+  
   return min;
 }
