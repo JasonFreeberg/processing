@@ -5,16 +5,17 @@ void keyPressed(){
     if(keyCode == UP && alpha < 255) alpha++;
     if(keyCode == DOWN && alpha > 1) alpha--;
   }
+
+  if(key == 'n' || key == 'N') normalize = !normalize;
   
+  if(key == 'j' || key == 'J') jesusChristItsJasonBourne(); 
   
-  if(key == 'n' || key == 'N'){
-    if(normalize == true){
-      
-    }
-  }
-  
+  println("norm  = " + normalize);
   println("alpha = " + alpha);
 }
 
-void normalizeDeviance(){
+void jesusChristItsJasonBourne(){
+    player.rewind();
+    player.play();
+    println("JESUSCHRISTITSJASONBOURNE");
 }

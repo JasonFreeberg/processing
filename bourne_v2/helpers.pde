@@ -17,3 +17,21 @@ float columnMin(float data[][], int column){
   
   return min;
 }
+
+float minMaxNorm(float value, float min, float max){
+  return (value - min)/(max - min);
+}
+
+void writeLabels(){
+  fill(0,0,0,255);
+  
+  textAlign(CENTER); // Title
+  textSize(36);
+  text("Bourne to Watch", width/2, vMargin/2);
+  
+  textSize(12); // Some labels
+  text("Checkouts of Jason Borune movies, 2005 - 2017", width/2, vMargin/2 + 30);
+  text("Use up and down arrows to adjust transparency.", width/3, height - vMargin/2);
+  text("Press N to normalize the data.", (2*width)/3, height - vMargin/2);
+  text("Press J.", width/2, height-vMargin/4);
+}

@@ -1,11 +1,13 @@
 
-import java.util.*; 
+import java.util.*;
+import ddf.minim.*;
+
 
 Table table;
 int nRows, nCols;
 float minTime, maxTime, minDaysOut, maxDaysOut, maxDev, minDev, minYear, maxYear;
 float[][] data;
-String[] titles = {"Identity", "Supremacy", "Ultimatum", "Legacy", "Jason Bourne"};
+String[] titles = {"Identity", "Supremacy", "Ultimatum", "Legacy"};
 String[] years = {"2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017"};
 int countColumns[] = {3,4,11};
 
@@ -14,6 +16,8 @@ float hMargin = 160;
 
 boolean normalize = false;
 
+Minim minim;
+AudioPlayer player;
 PImage background;
 PImage colors;
 Date date1, date2;
@@ -46,9 +50,11 @@ void setup(){
   date1 = new Date((long)minTime*1000);
   date2 = new Date((long)maxTime*1000);
   
-  // Images
+  // Load Files
   background = loadImage("background.jpg");
   colors = loadImage("colorMap.jpg");
+  minim = new Minim(this);
+  player = minim.loadFile("jcijb.aiff");
 }
 
 float row[];
@@ -65,6 +71,9 @@ void draw() {
   imageMode(CENTER);
   image(background, width/2, height/2);
   surface.setResizable(true);
+  
+  // Title
+  writeLabels();
   
   // Y-axis labels
   for(int i = 0; i < titles.length; i++){
@@ -84,11 +93,13 @@ void draw() {
   // X-axis labels and ticks
   for(int i = 0; i < years.length; i++){
     hPos = hMargin + i * (width - 2*hMargin)/years.length;//
-    line(hPos, height - vMargin, hPos, vMargin);
+    
+    stroke(0, 0, 0, 126);
+    line(hPos, height - vMargin - 5, hPos, vMargin);
+    
     textAlign(LEFT);
     fill(0);
     text(years[i], hPos, height - vMargin);
-    //fill(0,0,0, 10);
   }
   
   for(int index = 0; index < nRows; index++){
@@ -97,9 +108,12 @@ void draw() {
     // Start at checkout time (hPos) end at checkin time (rectWidth)
     hPos = map(row[1], minTime, maxTime, hMargin, width-hMargin);
     rectWidth = map(row[2], minTime, maxTime, hMargin, width-hMargin) - hPos;
-    lane = row[0]*(height - 2*vMargin)/5;
-    
-    colorLocation = map(row[11], minDev, maxDev, 2, colors.width-2);
+    lane = row[0]*(height - 2*vMargin)/titles.length;
+    if(normalize){
+      //println("normed = " + minMaxNorm(row[11], minDev, maxDev));
+      colorLocation = map(minMaxNorm(row[11], minDev, maxDev), 0, 1, 2, colors.width-2);
+    }
+    else colorLocation = map(row[11], minDev, maxDev, 2, colors.width-2);
     rectColor = colors.get((int)colorLocation, colors.height/2);
     vPos = vMargin + lane + row[6]*5;
     
