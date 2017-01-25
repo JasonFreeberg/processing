@@ -30,7 +30,7 @@ void writeLabels(){
   text("Bourne to Watch", width/2, vMargin/2);
   
   textSize(12); // Some labels
-  text("Checkouts of Jason Borune movies, 2005 - 2017", width/2, vMargin/2 + 30);
+  text("Checkouts of Jason Bourne movies, 2005 - 2017", width/2, vMargin/2 + 30);
   text("Use up and down arrows to adjust transparency.", width/3, height - vMargin/2);
   text("Press N to normalize the data.", (2*width)/3, height - vMargin/2);
   text("Press J.", width/2, height-vMargin/4);
