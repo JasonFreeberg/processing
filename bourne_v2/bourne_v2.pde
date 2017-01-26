@@ -4,27 +4,30 @@ import ddf.minim.*;
 
 Table table;
 int nRows, nCols;
-float minTime, maxTime, minDaysOut, maxDaysOut, maxDev, minDev, minYear, maxYear;
+float minTime, maxTime;
 float[][] data;
-String[] titles = {"Identity", "Supremacy", "Ultimatum", "Legacy"};
-long[] years = {1136073600,1167609600,1199145600,1230768000,1262304000,1293840000,1325376000,1356998400,1388534400,1420070400,1451606400,1483228800};
-long[] releases = {1188432000, 1197331200, 1344297600, 1355184000, 1469750400, 1479168000};
-String[] releaseNames = {"Ultimatum, Theaters", "Ultimatum, DVD", "Legacy, Theaters", "Legacy, DVD", "Jason Bourne, Theaters", "Jason Bourne, DVD"}; 
-
-int countColumns[] = {3,4,11};
 
 float vMargin = 100;
 float hMargin = 160;
+int textColor = #EFEFEF;
 
-boolean normalize = false;
+boolean showReleases = false;
 
 Minim minim;
 AudioPlayer player;
 PImage background;
-PImage colors;
 long year;
 
-void setup(){
+// Some hard-coded arrays
+String[] titles = {"Identity", "Supremacy", "Ultimatum", "Legacy"};
+long[] years = {1136073600, 1167609600, 1199145600, 1230768000, 1262304000, 1293840000, 1325376000, 1356998400, 1388534400, 1420070400, 1451606400, 1483228800};
+long[] releases = {1188432000, 1197331200, 1344297600, 1355184000, 1469750400, 1479168000};
+String[] releaseNames = {"Ultimatum in Theaters", "Ultimatum on DVD", "Legacy in Theaters", "Legacy on DVD", "Jason Bourne in Theaters", "Jason Bourne on DVD"}; 
+String[] monthNames = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+//int[][] colors = {{219, 3, 83, 341}, {85, 140, 26, 112}, {120, 228, 3, 161}, {2, 151, 151, 210}};
+int[] colors = {#DB0353, #029797, #FCF003, #78E403};
+
+void setup() {
   size(1280, 720);
   surface.setResizable(true);
 
@@ -41,17 +44,13 @@ void setup(){
       data[row][col] = table.getFloat(row, col);
     }
   }
-  
+
   minTime = min(columnMin(data, 1), columnMin(data, 2));
   maxTime = max(columnMax(data, 1), columnMax(data, 2));
-  maxDev = columnMax(data, 11);
-  minDev = columnMin(data, 11);
-  println("Max dev: " + maxDev);
-  println("Min dev: " + minDev);
-  
+
   // Load Files
   background = loadImage("background.jpg");
-  colors = loadImage("colorMap.jpg");
+  //colors = loadImage("colorMap.jpg");
   minim = new Minim(this);
   player = minim.loadFile("jcijb.aiff");
 }
@@ -63,95 +62,65 @@ float lane;
 float alpha = 5;
 
 void draw() {
-  
+
   // Set up canvas
-  background(255);
+  background(#22210B);
   tint(255, 126);
-  imageMode(CENTER);
-  image(background, width/2, height/2);
+  //imageMode(CENTER);
+  //image(background, width/2, height/2);
   surface.setResizable(true);
   
-  // Title
+  // Title and legends
   writeLabels();
-  
+
   // Y-axis labels
-  for(int i = 0; i < titles.length; i++){
-    vPos = vMargin + i*(height - 2*vMargin)/titles.length + 45;
-    
+  for (int i = 0; i < titles.length; i++) {
+    lane = (i + 1)*(height - 2*vMargin)/titles.length;
+    vPos = vMargin + lane - (height - 2*vMargin)/(titles.length * 2);
+
     pushMatrix(); // Translate the axis
     translate(hMargin - 10, vPos);
     rotate(-HALF_PI);
-    
+
     textAlign(CENTER); // Write text
-    fill(0);
+    fill(textColor);
     text(titles[i], 0, 0);
-    
+
     popMatrix(); // Reset axis
   }
-  
+
   // X-axis labels and ticks
-  for(int i = 0; i < years.length; i++){
-      year = years[i];
-      hPos = map(year, minTime, maxTime, hMargin, width-hMargin);
-      year = new Date((long)year*1000).getYear() + 1900;
-      
-      stroke(0, 0, 0, 126);
-      line(hPos, height - vMargin, hPos, vMargin);
-      textAlign(CENTER);
-      fill(0);
-      text((int)year, hPos, height - vMargin + 15);
-  }
-  
-  
-  /*
-  for(int i = 0; i < years.length; i++){
-    hPos = hMargin + i * (width - 2*hMargin)/years.length;//
+  for (int i = 0; i < years.length; i++) {
+    year = years[i];
+    hPos = map(year, minTime, maxTime, hMargin, width-hMargin);
+    year = new Date((long)year*1000).getYear() + 1900;
     
-    stroke(0, 0, 0, 126);
+    // Tick marks
+    strokeWeight(1);
+    stroke(textColor, 200);
     line(hPos, height - vMargin, hPos, vMargin);
     
-    textAlign(LEFT);
-    fill(0);
-    text(years[i], hPos, height - vMargin + 15);
+    // Labels
+    textAlign(CENTER);
+    fill(textColor);
+    text((int)year, hPos, height - vMargin + 15);
   }
-  */
-  
-  for(int index = 0; index < nRows; index++){
+
+  // Main visualization
+  for (int index = 0; index < nRows; index++) {
     row = data[index];
-    
+
     // Start at checkout time (hPos) end at checkin time (rectWidth)
     hPos = map(row[1], minTime, maxTime, hMargin, width-hMargin);
     rectWidth = map(row[2], minTime, maxTime, hMargin, width-hMargin) - hPos;
     lane = row[0]*(height - 2*vMargin)/titles.length;
-    colorLocation = map(row[0], 0, 5, 2, colors.width-2);
-    rectColor = colors.get((int)colorLocation, colors.height/2);
     vPos = vMargin + lane;
-    
+
     noStroke();
-    fill(red(rectColor), blue(rectColor), green(rectColor), alpha);
+    fill(colors[(int)row[0]], alpha);
     rect(hPos, vPos, rectWidth, (height - 2*vMargin)/titles.length);
   }
-  
-  /*
-  List<Integer> newYears = new ArrayList<Integer>();
-  
-  for(int index = 0; index < nRows; index++){
-    row = data[index];
-    
-    day = new Date((long)row[1]*1000).getDay();
-    month = new Date((long)row[1]*1000).getMonth() + 1;
-    year = new Date((long)row[1]*1000).getYear() + 1900;
-    
-    hPos = map(row[1], minTime, maxTime, hMargin, width-hMargin);
-    
-    if(checkNewYear(day,month) && !newYears.contains(year)){
-      stroke(0, 0, 0, 126);
-      line(hPos, height - vMargin, hPos, vMargin);
-      textAlign(CENTER);
-      fill(0);
-      text(year, hPos, height - vMargin + 15);
-      newYears.add(year);
-    }
-  }
-  */
+
+  // Release Dates
+  if (showReleases) plotReleases();
 }
