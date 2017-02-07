@@ -1,4 +1,17 @@
+/*
+  January 26, 2016
+  Jason Freeberg
+  MAT 259A - Winter 2017
+  
+  Description:
+  Visualizing usage of the library's Jason Bourne DVD movies, and investigating
+  a correspondance with the releases of newer movies in the series. 
 
+  GitHub Repo: 
+  https://github.com/JasonFreeberg/processing/tree/master/bourne_v2
+*/
+
+// Date and sound libraries
 import java.util.*;
 import ddf.minim.*;
 
@@ -17,6 +30,7 @@ Minim minim;
 AudioPlayer player;
 PImage background;
 long year;
+PFont font;
 
 // Some hard-coded arrays
 String[] titles = {"Identity", "Supremacy", "Ultimatum", "Legacy"};
@@ -24,7 +38,6 @@ long[] years = {1136073600, 1167609600, 1199145600, 1230768000, 1262304000, 1293
 long[] releases = {1188432000, 1197331200, 1344297600, 1355184000, 1469750400, 1479168000};
 String[] releaseNames = {"Ultimatum in Theaters", "Ultimatum on DVD", "Legacy in Theaters", "Legacy on DVD", "Jason Bourne in Theaters", "Jason Bourne on DVD"}; 
 String[] monthNames = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-//int[][] colors = {{219, 3, 83, 341}, {85, 140, 26, 112}, {120, 228, 3, 161}, {2, 151, 151, 210}};
 int[] colors = {#DB0353, #029797, #FCF003, #78E403};
 
 void setup() {
@@ -47,27 +60,24 @@ void setup() {
 
   minTime = min(columnMin(data, 1), columnMin(data, 2));
   maxTime = max(columnMax(data, 1), columnMax(data, 2));
-
-  // Load Files
-  background = loadImage("background.jpg");
-  //colors = loadImage("colorMap.jpg");
+  
+  PFont.list();
+  font = createFont("SansSerif", 12);
+  textFont(font);
+  //Minim player class
   minim = new Minim(this);
   player = minim.loadFile("jcijb.aiff");
 }
 
 float row[];
-float hPos, vPos, rectWidth, colorLocation;
+float hPos, vPos, rectWidth;
 int rectColor;
 float lane;
 float alpha = 5;
 
 void draw() {
-
   // Set up canvas
   background(#22210B);
-  tint(255, 126);
-  //imageMode(CENTER);
-  //image(background, width/2, height/2);
   surface.setResizable(true);
   
   // Title and legends

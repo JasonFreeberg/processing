@@ -5,8 +5,6 @@ void keyPressed(){
     if(keyCode == UP && alpha < 255) alpha++;
     if(keyCode == DOWN && alpha > 1) alpha--;
   }
-
-  //if(key == 'n' || key == 'N') normalize = !normalize;
   
   if(key == 'j' || key == 'J') jesusChristItsJasonBourne(); 
   
@@ -21,7 +19,6 @@ void jesusChristItsJasonBourne(){
    player.play();
    println("JESUSCHRISTITSJASONBOURNE");
 }
-
 
 void plotReleases(){
   assert(releases.length == releaseNames.length);
@@ -52,7 +49,7 @@ void mousePosToDate(float hPos, float vPos){
      (mouseY > vMargin) && (mouseY < (height - vMargin))){
     
     float mouseTime = map(mouseX, hMargin, width - hMargin, minTime, maxTime);
-    int mouseYear = new Date((long)mouseTime*1000).getYear() + 1900;
+    int mouseYear = new Date((long)mouseTime*1000).getYear() + 1899;
     int mouseMonth = new Date((long)mouseTime*1000).getMonth();
     
     text(monthNames[mouseMonth] + ' ' + mouseYear, hPos, vPos);
