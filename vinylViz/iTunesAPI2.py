@@ -13,31 +13,32 @@ from time import sleep
 # Class for accessing iTunes API
 class pyTunes():
     def __init__(self, mediaType, entity):
-        self.media = mediaType
-        self.entity = entity
-        self.data = None
+        self.media = mediaType  # movies, music, books,  etc.
+        self.entity = entity    # album, song, artist, etc.
+        self.data = None        # hold JSON
+        self.noData = 0         # count times no data returned
+        self.term = ''          # the searched string
         self.URL = "https://itunes.apple.com/search?" + "media=" + self.media + "&entity=" + self.entity
-        self.noData = 0
 
     def search(self, term):
-        newTerm = term.lower().replace(' ', '+')
+        self.term = term.lower().replace(' ', '+')
         try:
-            request = requests.get(self.URL + "&term=" + newTerm)
+            request = requests.get(self.URL + "&term=" + self.term)
             self.data = json.loads(request.text)
         except json.JSONDecodeError:
-            print("No response, data = None.")
+            print("No response for {0}".format(term))
             self.data = None
 
     def getField(self, field):
-        if self.data is None:
+        try:
+            return self.data["results"][0][field]
+        except IndexError:
+            print("No {0} field for entity {1}".format(field, self.term))
+            self.noData += 1
             return ''
-        else:
-            try:
-                return self.data["results"][0][field]
-            except IndexError:
-                print("No results for {0}, returned empty string.".format(field))
-                self.noData += 1
-                return ''
+        except TypeError:
+            print("self.data is of type", type(self.data), "returned empty string.")
+            return ''
 
 
 # Parses copyright from iTunes API

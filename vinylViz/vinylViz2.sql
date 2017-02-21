@@ -1,5 +1,9 @@
-
-
+/*
+ Jason Freeberg
+ MAT 259A -- Winter 2017
+ Checkouts of audio CDs in the SPL database. Narrowed down to only
+ music CDs. Since the query can take a long time, I se
+*/
 
 SELECT 
 	unix_timestamp(tr.checkOut) as checkOut,
@@ -7,28 +11,16 @@ SELECT
     IFNULL(tr.checkIn - tr.checkOut, 0) as timeOut,
     o.title,
     o.itemType,
-    o.collCode,
-    o.bibNumber
+    o.bibNumber,
+    o.deweyClass
 FROM
 	spl_2016.transactions as tr
 JOIN spl_2016.outraw as o
 	ON tr.itemNumber = o.itemNumber
-/* 
-# Just gonna do this in Python... I FUCKING GUESS
-JOIN (
-	SELECT 
-		bibnumber,
-		COUNT(bibNumber) as popularity
-	FROM spl_2016.transactions as tr
-	GROUP BY
-		bibnumber
-	 ) as p
-     ON p.bibnumber = tr.bibnumber
-*/
 WHERE
-	#i.cin is not null AND
-	year(tr.checkOut) > 2012 AND 
-    year(tr.checkOut) < 2014 AND
-	o.itemtype REGEXP "(cas|cd|rec)" AND
-    NOT o.itemtype REGEXP "dvd"
-LIMIT 100000
+	year(tr.checkOut) > 2015 AND 
+    year(tr.checkOut) < 2017 AND
+	(o.itemType REGEXP "cd" AND NOT o.itemtype REGEXP "(cas|bccd|acdisk|dvd|rec)") AND # Only CDs
+    ROUND(o.deweyClass) = 782 # 782 is "vocal music"
+limit
+	1000000
