@@ -1,3 +1,6 @@
+# Jason Freeberg
+# MAT 259 Winter 2017
+# Join is very slow, so I will join them using Python
 
 SELECT 
 	bibnumber,
