@@ -25,16 +25,19 @@ class pyTunes():
             request = requests.get(self.URL + "&term=" + newTerm)
             self.data = json.loads(request.text)
         except json.JSONDecodeError:
-            print("No response.")
-            self.data = {"results": []}
+            print("No response, data = None.")
+            self.data = None
 
     def getField(self, field):
-        try:
-            return self.data["results"][0][field]
-        except IndexError:
-            print("No results for {0}, returned empty string.".format(field))
-            self.noData += 1
+        if self.data is None:
             return ''
+        else:
+            try:
+                return self.data["results"][0][field]
+            except IndexError:
+                print("No results for {0}, returned empty string.".format(field))
+                self.noData += 1
+                return ''
 
 
 # Parses copyright from iTunes API

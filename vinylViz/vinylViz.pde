@@ -33,7 +33,7 @@ void setup() {
   cam.setMinimumDistance(5);
   cam.setMaximumDistance(startDistance + 950);
   
-  // Load data to objects
+  // Load transactions.csv
   table = loadTable("transactions.csv", "header");
   nRows = table.getRowCount();
   println("Rows: " + nRows);
@@ -53,7 +53,8 @@ void setup() {
   println("maxDate = " + maxDate);
   println("minDate = " + minDate);
   
-  for(int i = 20; i < 10000; i++)
+  // Make object for each transaction
+  for(int i = 20; i < 1000; i++)
   {
     float checkOut = table.getFloat(i, 0);
     float checkIn = table.getFloat(i, 1);
