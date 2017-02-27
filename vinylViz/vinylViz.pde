@@ -198,5 +198,4 @@ void draw() {
     perspective(PI/3.0, (float)width/height, 1, 100000);
     cp5.draw();
   cam.endHUD();
-    
 }
