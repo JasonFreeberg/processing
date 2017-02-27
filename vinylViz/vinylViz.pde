@@ -127,16 +127,8 @@ void draw() {
     //shape(libItems.get(i).segment);
   }
   
-  //cam.beginHUD();
-  //hint(DISABLE_DEPTH_TEST);
-  //pushMatrix();
-    cam.beginHUD();
-    //translate(360, 465);
-    perspective(PI/3.0, (float)width/height, 1, 100000);
-    cp5.draw();
-    cam.endHUD();
-  //popMatrix();
-  //hint(ENABLE_DEPTH_TEST);
-  
-  
+  cam.beginHUD();
+  perspective(PI/3.0, (float)width/height, 1, 100000);
+  cp5.draw();
+  cam.endHUD();
 }
