@@ -11,15 +11,28 @@ void keyPressed() {
     spin = !spin;
     if (!spin) println("Halt rotation.");
   }
-
-  if (key == 'a' || key == 'A') {
-    checkbox.activateAll();
+  
+  if (key == 'p' || key == 'P') {
+    play = !play;
   }
-
+  
   if (key == 'r' || key == 'R') {
-    checkbox.deactivateAll();
+    player.rewind();
   }
-
+  
+  
+  if (key == 'm' || key == 'M') {
+    checkAllMonths = !checkAllMonths;
+    if(checkAllMonths){ checkbox.activateAll(); }
+    else {checkbox.deactivateAll();}
+  }
+  
+  if (key == 'y' || key == 'Y') {
+    checkAllYears = !checkAllYears;
+    if(checkAllYears){ checkbox2.activateAll(); }
+    else {checkbox2.deactivateAll();}
+  }
+  
   if (key == CODED) {
     if (keyCode == UP) {
       speed += speedStep;
@@ -32,21 +45,18 @@ void keyPressed() {
   }
 }
 
-
-void presentationRotation() {
-  // Rotates the camera to fake a spinning vinyl record
-  if (spin) {
-    println("Spinning.");
-    cam.rotateZ(-speed); // Actually rotates in negative direction
-  } else {
-    println("Not spinning.");
+void playerControls(){
+  if(play == true){
+    player.play();
+  } else{ 
+    player.pause();
   }
 }
 
 void drawLabels() {
   // To rotate towards camera
   camRotations = cam.getRotations();
-  println("Rotations = " + camRotations[0] + " , " + camRotations[2]+ " , " + camRotations[2]);
+  //println("Rotations = " + camRotations[0] + " , " + camRotations[2]+ " , " + camRotations[2]);
 
   drawRecordLabel();
   drawZLabels();
@@ -57,8 +67,8 @@ void drawTitle() {
   pushMatrix();
 
   // Gets cropped at current distance, make this closer or heighten cutoff plane
-  translate(-maxRadius + -774, 
-    -maxRadius + -53, 
+  translate(-maxRadius + -1625, 
+    -maxRadius + -375, 
     maxDepth/2);
   rotateX(camRotations[0]);
   rotateY(camRotations[1]);
@@ -105,20 +115,25 @@ void drawZLabels() {
   line(0, 0, 0, 0, 0, maxDepth);
 
   pushMatrix();
-  fill(255);
-  translate(0, 0, maxDepth/2);
-  rotateY(PI/2);
-
-  textSize(150);
-  textAlign(CENTER);
-  text("Item Popularity", 0, 0, 0);
-
-  textSize(75);
-  textAlign(LEFT);
-  text("More Popular", +maxDepth/2 + 5, 0, 0);
-
-  textSize(75);
-  textAlign(RIGHT);
-  text("Less Popular", -maxDepth/2, 0, 0);
+    fill(255);
+    translate(0, 0, maxDepth/2);
+    rotateY(PI/2);
+  
+    textSize(150);
+    textAlign(CENTER);
+    text("Weekly", 0, -5, 0);
+    text("Popularity", 0, 125, 0);
+  
+    textSize(75);
+    textAlign(LEFT);
+    text("More Popular", +maxDepth/2 + 5, 0, 0);
+  
+    textSize(75);
+    textAlign(RIGHT);
+    text("Less Popular", -maxDepth/2, 0, 0);
   popMatrix();
+}
+
+public boolean contains(final int[] array, final int key) {     
+    return contains(array, key);
 }
