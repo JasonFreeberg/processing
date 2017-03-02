@@ -43,23 +43,21 @@ def parseText(soup):
 	citations = re.compile(r"\[\d+\]")  # Removes citations
 
 	paragraphs = soup.findAll("p")
-	corpus = ""
+	parsedText = ""
 	for paragraph in paragraphs:
 		text = str(paragraph.get_text())
 		noCites = citations.sub(repl="", string=text)
-		corpus += noCites
+		parsedText += noCites
 
-	nWords = len(corpus.split())
-	nChar = len(corpus)
+	nWords = len(parsedText.split())
+	nChar = len(parsedText)
 
-	return corpus, nWords, nChar
+	return parsedText, nWords, nChar
 
 
-def getLinksFromURL(aURL):
+def getLinks(soup):
 	validLinks = re.compile(r"(?=(^/wiki))(?!.*(:))(?!.*(disambiguation))(?!.*(Main_Page))")
 
-	html = urlopen(aURL).read()
-	soup = BeautifulSoup(html, "lxml")
 	links = soup.findAll("a")
 	returnLinks = []  # list of extensions to return
 
@@ -72,33 +70,56 @@ def getLinksFromURL(aURL):
 	return list(set(returnLinks))
 
 
-def getArticles(aURL, layer, extensionsSoFar):
+def getArticles(anExtension, layer, dataFrame):
 	baseURL = "https://en.wikipedia.org"
 
 	if layer <= 1 and len(extensionsSoFar) < 50000:
-		links = getLinksFromURL(aURL)
-		for link in links:
+
+		html = urlopen(baseURL + anExtension).read()
+		soup = BeautifulSoup(html, "lxml")
+		
+		links = pd.DataFrame({"extension": getLinks(soup)})
+		dataFrame = dataFrame.merge([dataFrame, links], on="extension", how="outer")
+
+		newData = pd.DataFrame({
+			"extension": [anExtension],
+			"title": [getTitle(soup)],
+			"imgURL": [parseImages(soup)[0]],
+		    "nChar": [parseText(soup)[2]],
+		    "nWords": [parseText(soup)[1]],
+		    "nImg": [parseImages(soup)[1]],
+		    "nLinks": [len(links)],
+		    "text": [parseText(soup)[0]]
+		})
+
+		dataFrame = dataFrame.merge([dataFrame, newData], on="extension", how="outer")
+
+		for link in dataframe.links:
 			if link not in extensionsSoFar:
 				extensionsSoFar.append(link)
-				#print(len(extensionsSoFar), "extensions so far. Currently at layer", layer)
-				getArticles(baseURL + link, layer + 1, extensionsSoFar, layerCount)
+
+				print(len(extensionsSoFar), "extensions so far. Currently at layer", layer)
+				getArticles(link, layer + 1, dataFrame)
 	else: # stop recursion
 		pass
 
 if __name__ == "__main__":
-	#idk = getLinksFromURL(baseURL + "/wiki/Philosophy")
-	lotsOfFuckingArticles = []
-	layerCount = []
-	getArticles(baseURL + "/wiki/Donald_Trump", 0, lotsOfFuckingArticles)
 
-	lotsOfFuckingArticles.sort()
-	print("-----------------------------------------------------", "\n \n \n \n\n\n")
+	start = "/wiki/Philosophy"
 
-	print("Scraped", len(lotsOfFuckingArticles), "articles.")
-	print("Max layer =", max(layerCount))
+	data = {
+			"title": [],
+			"extension": [],
+			"imgURL": [],
+		    "nChar": [],
+		    "nWords": [],
+		    "nImg": [],
+		    "nLinks": [],
+		    "text": []
+		    }
 
-	for i in range(0, len(lotsOfFuckingArticles)):
-		print(lotsOfFuckingArticles[i], "\t\t\t\t\t\t", layerCount[i])
+	frame = pd.DataFrame(data)
+
 
 
 
