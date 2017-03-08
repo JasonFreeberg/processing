@@ -9,6 +9,8 @@
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import PCA
 from time import sleep
 import pandas as pd
 import re
@@ -30,11 +32,15 @@ def getTitle(soup):
 
 # Image for article
 def parseImages(soup):
-	parseImagesURL = re.complie(r"")
+	parseImagesURL = re.compile(r"")
 	images = soup.findAll("img")
-	sideTable = soup.find("table", attrs = {"class": "vertical-navbox"})
-	tableImage = sideTable.find("img").get("src")
 	nImages = len(images)
+	try:
+		sideTable = soup.find("table", attrs = {"class": "vertical-navbox"})
+		tableImage = sideTable.find("img").get("src")
+	except AttributeError:
+		print("No image for article:", getTitle(soup))
+		tableImage = ""
 
 	return tableImage, nImages
 
@@ -59,55 +65,64 @@ def getLinks(soup):
 	validLinks = re.compile(r"(?=(^/wiki))(?!.*(:))(?!.*(disambiguation))(?!.*(Main_Page))")
 
 	links = soup.findAll("a")
-	returnLinks = []  # list of extensions to return
+	returnLinks = set()  # set of extensions to return
 
 	for link in links:
 		href = str(link.get("href"))
 
 		if validLinks.match(href):
-			returnLinks.append(href)
+			returnLinks.add(href)
 
-	return list(set(returnLinks))
+	return returnLinks
 
 
-def getArticles(anExtension, layer, dataFrame):
-	baseURL = "https://en.wikipedia.org"
+def getArticles(anExtension, level=0, extensionsSoFar=set(), parent="None"):
 
-	if layer <= 1 and len(extensionsSoFar) < 50000:
+	# Parse the HTML, make soup object
+	html = urlopen("https://en.wikipedia.org" + anExtension).read()
+	soup = BeautifulSoup(html, "lxml")
+	links = getLinks(soup)
 
-		html = urlopen(baseURL + anExtension).read()
-		soup = BeautifulSoup(html, "lxml")
-		
-		links = pd.DataFrame({"extension": getLinks(soup)})
-		dataFrame = dataFrame.merge([dataFrame, links], on="extension", how="outer")
+	yield {"title": [getTitle(soup)],
+		   "extension": [anExtension],
+		   "imgURL": [parseImages(soup)[0]],
+		   "nChar": [parseText(soup)[2]],
+		   "nWords": [parseText(soup)[1]],
+		   "nImg": [parseImages(soup)[1]],
+	       "nLinks": [len(links)],
+	       "level": [level],
+	       "text": [parseText(soup)[0]]
+		  }
 
-		newData = pd.DataFrame({
-			"extension": [anExtension],
-			"title": [getTitle(soup)],
-			"imgURL": [parseImages(soup)[0]],
-		    "nChar": [parseText(soup)[2]],
-		    "nWords": [parseText(soup)[1]],
-		    "nImg": [parseImages(soup)[1]],
-		    "nLinks": [len(links)],
-		    "text": [parseText(soup)[0]]
-		})
-
-		dataFrame = dataFrame.merge([dataFrame, newData], on="extension", how="outer")
-
-		for link in dataframe.links:
-			if link not in extensionsSoFar:
-				extensionsSoFar.append(link)
-
-				print(len(extensionsSoFar), "extensions so far. Currently at layer", layer)
-				getArticles(link, layer + 1, dataFrame)
-	else: # stop recursion
-		pass
-
+	# If at level 0, 1
+	if level < 1:
+		for link in links - extensionsSoFar:
+			extensionsSoFar.add(link)
+			yield from getArticles(link, level + 1, extensionsSoFar, getTitle(soup))
+	"""
+	else: # at level 2, parse and return
+		yield {
+				"title": [getTitle(soup)],
+				"extension": [anExtension],
+				"imgURL": [parseImages(soup)[0]],
+			    "nChar": [parseText(soup)[2]],
+			    "nWords": [parseText(soup)[1]],
+			    "nImg": [parseImages(soup)[1]],
+			    "nLinks": [len(links)],
+			    "level": [level],
+			    "text": [parseText(soup)[0]]
+			  }
+	"""
 if __name__ == "__main__":
 
-	start = "/wiki/Philosophy"
+	vectorizer = TfidfVectorizer(stop_words="English", lowercase=True)
 
-	data = {
+	# Starting values
+	start = "/wiki/Philosophy"
+	parent = "none"
+
+	# Accumulator
+	data = pd.DataFrame({
 			"title": [],
 			"extension": [],
 			"imgURL": [],
@@ -115,10 +130,23 @@ if __name__ == "__main__":
 		    "nWords": [],
 		    "nImg": [],
 		    "nLinks": [],
+		    "level": [],
 		    "text": []
-		    }
+		    })
 
-	frame = pd.DataFrame(data)
+	try:
+		for elem in getArticles(start, parent="None"):
+			elem = pd.DataFrame(elem)
+			data = data.append(elem)
+	except KeyboardInterrupt:
+		pass
+
+	dim = data.shape
+	print("Rows:", dim[0], "Columns:", dim[1])
+	print(data.head())
+
+	tfidf = vectorizer.fit_transform()
+	
 
 
 
