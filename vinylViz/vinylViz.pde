@@ -132,7 +132,7 @@ void setup() {
   }
   
   // Make object for each transaction
-  for(int i = 0; i < nRows; i++)
+  for(int i = 0; i < nRows-5; i+=4)
   {
     float checkOut = table.getFloat(i, 0);
     float checkIn = table.getFloat(i, 1);
