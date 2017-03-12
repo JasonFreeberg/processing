@@ -1,4 +1,4 @@
-
+// For connecting articles to their parents/children
 
 class Edge{
   
