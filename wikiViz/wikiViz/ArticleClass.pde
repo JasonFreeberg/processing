@@ -21,32 +21,35 @@ class Article{
     this.prcomps = prcomps_;
     
     // Calculate some values in constructor
-    for(int i = 0; i < 3; i++){
-      print(this.prcomps[i] + "   ");
-      this.prcomps[i] = random(-maxDist, maxDist); //map(this.prcomps[i], minComps[i], maxComps[i], -maxDist, maxDist);
-    }
-    for(int i = 3; i < 6; i++){
-      this.prcomps[i] = map(this.prcomps[i], minComps[i], maxComps[i], 0, 255);
-    }
+    /*
+    this.prcomps[0] = map(this.prcomps[0], this.minComps[0], this.maxComps[0], -this.maxDist, this.maxDist);
+    this.prcomps[1] = map(this.prcomps[1], this.minComps[1], this.maxComps[1], -this.maxDist, this.maxDist);
+    this.prcomps[2] = map(this.prcomps[2], this.minComps[2], this.maxComps[2], -this.maxDist, this.maxDist);
+    this.prcomps[3] = map(this.prcomps[3], this.minComps[3], this.maxComps[3], 0, 255);
+    this.prcomps[4] = map(this.prcomps[4], this.minComps[4], this.maxComps[4], 0, 255);
+    this.prcomps[5] = map(this.prcomps[5], this.minComps[5], this.maxComps[5], 0, 255);
+    */
     
-    this.pcaColor = color(prcomps[3], prcomps[4], prcomps[5]);
+    //for(int r = 0; r < 5; r++){
+     // print(this.prcomps[r] + "   ");
+    //}
+    //for(int i = 0; i < 3; i++){
+    //  print(this.prcomps[i] + "   ");
+    //  this.prcomps[i] = random(-maxDist, maxDist); //map(this.prcomps[i], minComps[i], maxComps[i], -maxDist, maxDist);
+    //}
+    //for(int i = 3; i < 6; i++){
+    //  this.prcomps[i] = map(this.prcomps[i], minComps[i], maxComps[i], 0, 255);
+    //}
+    
+    //this.pcaColor = color(this.prcomps[3], this.prcomps[4], this.prcomps[5]);
+    this.pcaColor = color(random(0, 200));
     this.defaultCoord[1] = map(level, 0, 2, 0, -maxDist);
-    print(this.pcaColor);
-    print('\n');
+    //print(this.pcaColor);
+    //print('\n');
   }
   
   private void makeShape(){
     //this.shape = createShape(SPHERE, 100);
-  }
-  
-  public float[] getCoordinates(){
-    float[] returnVect = new float[3];
-    if(this.usingPCA){
-      for(int i = 0; i < 2; i++){ returnVect[i] = this.prcomps[i]; }
-    }else{
-      for(int i = 0; i < 2; i++){ returnVect[i] = this.defaultCoord[i]; }
-    }
-    return(returnVect);
   }
   
   public void drawShape(boolean usePCA){
@@ -57,9 +60,6 @@ class Article{
     */
     if(usePCA == false){ // don't use PCA
       this.usingPCA = false;
-      //this.shape.translate(__, this.defaultY, __);
-      //this.shape.setFill(this.colorCodes[this.level]);
-      //this.shape.setStroke(this.colorCodes[this.level]);
     }else{ // use PCA
       //print("Plotting!");
       this.usingPCA = true;
@@ -68,19 +68,21 @@ class Article{
         fill(this.pcaColor);
         stroke(this.pcaColor);
         translate(this.prcomps[0], this.prcomps[1], this.prcomps[2]);
+        sphere(10);
         //print(this.prcomps[0], this.prcomps[1], this.prcomps[2], this.title, '\n');
-        sphere(0.5);
       popMatrix();
-      //this.shape.translate(this.prcomps[0], this.prcomps[1], this.prcomps[2]);
-      //this.shape.setFill(color(0,0,0));
-      //this.shape.setStroke(color(0,0,0));
-      //shape(this.shape);
-      
-      //this.shape.setFill(this.pcaColor);
-      //this.shape.setStroke(this.pcaColor);
     }
     
   }
-  
-  
 }
+  /*
+ public float[] getCoordinates(){
+    float[] returnVect = new float[3];
+    if(this.usingPCA){
+      for(int i = 0; i < 2; i++){ returnVect[i] = this.prcomps[i]; }
+    }else{
+      for(int i = 0; i < 2; i++){ returnVect[i] = this.defaultCoord[i]; }
+    }
+    return(returnVect);
+  }
+  */

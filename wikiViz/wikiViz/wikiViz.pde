@@ -12,11 +12,12 @@ import java.util.Map;
 
 PShape aShape;
 PeasyCam cam;
-
+final float[] minComps = {-0.4094028, -0.4262940, -0.3464782, -0.3702722, -0.3905856, -0.3051968, -0.3117960, -0.3182977};
+final float[] maxComps = {0.6702876, 0.7053004, 0.6421811, 0.5380188, 0.7148252, 0.5752281, 0.5103850, 0.5354660};
 // Viz constants and parameters
 final float zCenter = 0;
 final float startDistance = 150;
-final float maxDist = 5000;
+final float maxDist = 50;
 boolean usePCA = true;
 
 // Arrays
@@ -50,8 +51,11 @@ void setup(){
     parent = table.getString(i, 2);
     
     // Get principle components
-    for(int j = 0; j < 8; j++){ prComps[j] = table.getFloat(i, j+3); }
-    //println(prComps);
+    for(int j = 0; j < 8; j++){ 
+      prComps[j] = map(table.getFloat(i, j+3), minComps[j], maxComps[j], -maxDist, maxDist);
+      print(prComps[j] + "   ");
+    }
+    print('\n');
     articles.add(new Article(title, parent, level, prComps));
   }
   println(" done!");
@@ -69,24 +73,10 @@ void draw(){
     popMatrix();
   }
   articles.get(fuck).drawShape(usePCA);
-  articles.get(199).drawShape(usePCA);
- articles.get(99).drawShape(usePCA);
-  articles.get(19).drawShape(usePCA);
-  articles.get(345).drawShape(usePCA);
-  //articles.get(1000).drawShape(usePCA);
-  /*
-  articles.get(300).drawShape(usePCA);
-  articles.get(1).drawShape(usePCA);
-  articles.get(23).drawShape(usePCA);
-  articles.get(200).drawShape(usePCA);
-  articles.get(123).drawShape(usePCA);
-  articles.get(33).drawShape(usePCA);
-  articles.get(9).drawShape(usePCA);
-  */
-  //for(int i = 0; i < articles.size(); i++){
-    //if(i % 10 == 0){
-    //  println(articles.get(i).shape);
-    //}
-  //}
+  for(int i = 0; i < articles.size(); i++){
+    if(i % 10 == 0){
+      println(articles.get(i).shape);
+    }
+  }
   
 }

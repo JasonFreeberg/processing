@@ -14,8 +14,8 @@ class Edge{
   }
   
   private void makeLine(){
-    this.a1Coord = this.a1.getCoordinates();
-    this.a2Coord = this.a2.getCoordinates();
+    //this.a1Coord = this.a1.getCoordinates();
+    //this.a2Coord = this.a2.getCoordinates();
     
   }
   
