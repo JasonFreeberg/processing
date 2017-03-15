@@ -37,7 +37,6 @@ void GUI(boolean showGUI){
       searchNow = !searchNow;
       selectedTitles.clear();
       textValue = cp5.get(Textfield.class, "input").getText();
-      
       for(String title : titleMap.keySet()){
         if(match(title.toLowerCase(), textValue.toLowerCase()) != null && !cp5.get(Textfield.class, "input").getText().equals("")){
           selectedTitles.add(title);
@@ -45,10 +44,14 @@ void GUI(boolean showGUI){
       }
       cp5.get(ScrollableList.class, "dropdown").setItems(selectedTitles);
       cp5.get(ScrollableList.class, "dropdown").show();
-      println(selectedTitles.size(), " items selected.");
+      
     }else if(cp5.get(Textfield.class, "input").getText().equals("")){
       selectedTitles.clear();
       cp5.get(ScrollableList.class, "dropdown").hide();
+    }
+    
+    if(selectedTitles.size() > 0){
+      drawlines();
     }
     
     hint(DISABLE_DEPTH_TEST);
@@ -65,13 +68,26 @@ public void submit(int theValue){
   searchNow = true;
 }
 
-public void PCA(){
-  println("PCA button pressed.");
-  usePCA = !usePCA;
+void drawlines(){
+  selectedValue = titleMap.get(selectedTitles.get((int)cp5.get(ScrollableList.class, "dropdown").getValue())).title;
+
+  Edge edge = edgeMap.get(selectedValue);
+  println(edge.child);
+  //println(edge.parent);
+  edge.drawLine();
+  int s = 0;
+  while(match(edge.parent.toLowerCase(), "philosophy") == null && s < 50){
+    edge = edgeMap.get(edge.parent);
+    edge.drawLine();
+    println(edge.parent);
+    //println("Edge from " + edge.child + " to " + edge.parent + ".");
+    //edgeMap.get(edge.parent).drawLine();
+    s++;
+  }
+  println(s);
 }
 
 void checkArticles(){
-  
   for(Article anArticle : titleMap.values()){
     if(checkboxLevel.getArrayValue()[anArticle.level] == 1){
       if(selectedTitles.size() > 0){ // user selected some titles
@@ -79,45 +95,13 @@ void checkArticles(){
           anArticle.display(255);
         }
         else{
-          anArticle.display(42.0);
+          anArticle.display(10.0);
         }
       }else{
         anArticle.display(255);
       }
     }
   }
-}
-
-public ArrayList<String> getLineage(String searchString){
-  ArrayList<String> titleTree = new ArrayList<String>();
-  while(searchString.toLowerCase() != "philosphy"){
-    titleTree.add(searchString);
-    searchString = parentMap.get(searchString).title;
-  }
-  titleTree.add("Philosophy");
-  return(titleTree);
-}
-
-public void drawTree(ArrayList<String> theTitles){
-  ArrayList<Float> coordinates = new ArrayList<Float>(); 
-  Float X,Y,Z;
-  
-  for(String title: theTitles){
-    for(int j = 0; j < 3; j++){
-      coordinates.add(titleMap.get(title).prComps[j]);
-    }
-  }
-  PShape s = createShape();
-  s.setStrokeWeight(1.5);
-  s.setStroke(color(0));
-  for(int j = 0; j < coordinates.size()-3; j+=3){
-    X = coordinates.get(j);
-    Y = coordinates.get(j+1);
-    Z = coordinates.get(j+2);
-    s.vertex(X,Y,Z);
-  }
-  s.endShape();
-  shape(s);
 }
 
 public static <T> boolean contains(final T[] array, final T v) {

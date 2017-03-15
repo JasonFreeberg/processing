@@ -2,9 +2,9 @@
 class Article{
   
   String title;
-  String parent;
+  public String parent;
   int level;
-  float[] prComps = new float[8];
+  public float[] prComps = new float[8];
 
   public Article(String title_, String parent_, int level_, float[] prComps_){
     this.title = title_;
@@ -26,5 +26,13 @@ class Article{
     stroke(color(this.prComps[3], this.prComps[4], this.prComps[5], transparency));
     strokeWeight(this.prComps[6]);
     point(this.prComps[0], this.prComps[1], this.prComps[2]);
-  } 
+  }
+  
+  public float[] getPCs(){
+    return(this.prComps);
+  }
+  
+  public String getTitle(){
+    return(this.title);
+  }
 }

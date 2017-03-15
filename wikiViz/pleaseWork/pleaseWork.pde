@@ -3,6 +3,7 @@ import peasy.*;
 import controlP5.*;
 import java.util.Map;
 import java.util.Arrays;
+import java.lang.System;
 
 // Peasy and P5
 PeasyCam cam;
@@ -12,18 +13,16 @@ CheckBox checkboxLevel;
 // Viz constants and parameters
 final float maxDist = 3000;
 final float startDistance = maxDist + 750;
-boolean usePCA = false; // gets switched to true when button is made 
 boolean showAxis = true;
 boolean showGUI = true;
 boolean searchNow = false;
 
-// Arrays
+// Arrays and maps
 ArrayList<Article> articles1 = new ArrayList<Article>();
 ArrayList<Article> articles2 = new ArrayList<Article>();
 ArrayList<String> selectedTitles = new ArrayList();
-
-HashMap<Article, Article> parentMap = new HashMap<Article, Article>();
-HashMap<String, Article> titleMap = new HashMap<String, Article>();
+HashMap<String, Article> titleMap = new HashMap<String, Article>(); // Maps the title to the article
+HashMap<String, Edge> edgeMap = new HashMap<String, Edge>(); // Holds edges and the name of the connected child
 
 void setup(){
   size(1280, 720, P3D);
@@ -69,22 +68,15 @@ void setup(){
      .setOff()
      ;
   
-  cp5.addButton("PCA")
-     .setValue(0)
-     .setSize(40, 40)
-     .setPosition(width - 550, 20)
-     .setOn()
-     ;
-  
   checkboxLevel.activateAll();
   
   // PeasyCam setup
   cam = new PeasyCam(this, 0, 0, 0, startDistance);
   //cam.setYawRotationMode();
   cam.setMinimumDistance(5);
-  cam.setMaximumDistance(maxDist + 950);
+  cam.setMaximumDistance(maxDist + 1550);
   cam.setRotations(0.5, 0.5, -0.25);
-  cam.setWheelScale(0.01);
+  cam.setWheelScale(0.08);
   
   // Loading Data
   Table table;
@@ -111,17 +103,16 @@ void setup(){
     prCompHolder[6] = table.getFloat(i, 9);
     
     Article tempArticle = new Article(title_, parent_, level_, prCompHolder);
-    if(tempArticle.level == 1){ articles1.add(tempArticle); }
-    if(tempArticle.level == 2){ articles2.add(tempArticle); }
 
     titleMap.put(title_, tempArticle);
   }
-  
-  for(Article anArticle : titleMap.values()){
-    Article child = anArticle;
+  for(Article child: titleMap.values()){
     Article parent = titleMap.get(child.parent);
-    parentMap.put(child, parent);
+    Edge edge = new Edge(child.prComps, parent.prComps, child.title, parent.title);
+      
+    edgeMap.put(child.title, edge);
   }
+
 }
 
 void draw(){
